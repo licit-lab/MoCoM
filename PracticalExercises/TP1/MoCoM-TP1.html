@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUMO Traffic Simulation - Complete Tutorial</title>
+  <style>
+    /* Design System Variables */
+    :root {
+      --color-white: rgba(255, 255, 255, 1);
+      --color-black: rgba(0, 0, 0, 1);
+      --color-cream-50: rgba(252, 252, 249, 1);
+      --color-cream-100: rgba(255, 255, 253, 1);
+      --color-gray-200: rgba(245, 245, 245, 1);
+      --color-gray-300: rgba(167, 169, 169, 1);
+      --color-gray-400: rgba(119, 124, 124, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+      --color-brown-600: rgba(94, 82, 64, 1);
+      --color-charcoal-700: rgba(31, 33, 33, 1);
+      --color-charcoal-800: rgba(38, 40, 40, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-teal-300: rgba(50, 184, 198, 1);
+      --color-teal-400: rgba(45, 166, 178, 1);
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-teal-700: rgba(26, 104, 115, 1);
+      --color-brown-600-rgb: 94, 82, 64;
+      --color-teal-500-rgb: 33, 128, 141;
+      --color-slate-900-rgb: 19, 52, 59;
+      --color-slate-500-rgb: 98, 108, 113;
+      --color-bg-1: rgba(59, 130, 246, 0.08);
+      --color-bg-2: rgba(245, 158, 11, 0.08);
+      --color-bg-3: rgba(34, 197, 94, 0.08);
+      --color-bg-4: rgba(239, 68, 68, 0.08);
+      --color-background: var(--color-cream-50);
+      --color-surface: var(--color-cream-100);
+      --color-text: var(--color-slate-900);
+      --color-text-secondary: var(--color-slate-500);
+      --color-primary: var(--color-teal-500);
+      --color-primary-hover: var(--color-teal-600);
+      --color-primary-active: var(--color-teal-700);
+      --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+      --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+      --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+      --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-size-sm: 12px;
+      --font-size-base: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+      --font-size-2xl: 20px;
+      --font-size-3xl: 24px;
+      --font-size-4xl: 30px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 550;
+      --font-weight-bold: 600;
+      --space-8: 8px;
+      --space-12: 12px;
+      --space-16: 16px;
+      --space-20: 20px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --space-48: 48px;
+      --radius-base: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-gray-400-rgb: 119, 124, 124;
+        --color-teal-300-rgb: 50, 184, 198;
+        --color-gray-300-rgb: 167, 169, 169;
+        --color-gray-200-rgb: 245, 245, 245;
+        --color-bg-1: rgba(29, 78, 216, 0.15);
+        --color-bg-2: rgba(180, 83, 9, 0.15);
+        --color-bg-3: rgba(21, 128, 61, 0.15);
+        --color-bg-4: rgba(185, 28, 28, 0.15);
+        --color-background: var(--color-charcoal-700);
+        --color-surface: var(--color-charcoal-800);
+        --color-text: var(--color-gray-200);
+        --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+        --color-primary: var(--color-teal-300);
+        --color-primary-hover: var(--color-teal-400);
+        --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+        --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+      }
+    }
+
+    @font-face {
+      font-family: 'FKGroteskNeue';
+      src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      line-height: 1.6;
+      font-size: var(--font-size-base);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-24);
+    }
+
+    header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-32) var(--space-24);
+      text-align: center;
+      margin-bottom: var(--space-48);
+    }
+
+    h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-16);
+    }
+
+    h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-16);
+    }
+
+    h3 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-12);
+    }
+
+    .subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .intro-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-32);
+      margin-bottom: var(--space-48);
+    }
+
+    .collapsible {
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-24);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .collapsible-header {
+      background: var(--color-surface);
+      padding: var(--space-20) var(--space-24);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid var(--color-card-border);
+    }
+
+    .collapsible-header:hover {
+      background: var(--color-secondary);
+    }
+
+    .collapsible-header h2 {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+    }
+
+    .collapsible-icon {
+      font-size: var(--font-size-2xl);
+      color: var(--color-primary);
+      transition: transform 0.3s ease;
+    }
+
+    .collapsible.active .collapsible-icon {
+      transform: rotate(180deg);
+    }
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .collapsible-content-inner {
+      padding: var(--space-32);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      margin: var(--space-24) 0;
+      border-radius: var(--radius-base);
+      overflow: hidden;
+      background: var(--color-bg-1);
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .image-container {
+      margin: var(--space-24) 0;
+      border-radius: var(--radius-base);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    code {
+      font-family: var(--font-family-mono);
+      background: var(--color-secondary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: var(--font-size-sm);
+    }
+
+    pre {
+      background: var(--color-bg-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      padding: var(--space-20);
+      overflow-x: auto;
+      margin: var(--space-16) 0;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: var(--font-size-sm);
+    }
+
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      margin-bottom: var(--space-20);
+      padding-left: var(--space-48);
+      position: relative;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: var(--color-primary);
+      color: var(--color-cream-50);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-base);
+    }
+
+    .step-list ul {
+      list-style: disc;
+      margin-left: var(--space-24);
+      margin-top: var(--space-8);
+    }
+
+    .step-list ul li::before {
+      display: none;
+    }
+
+    .platform-tabs {
+      display: flex;
+      gap: var(--space-12);
+      margin-bottom: var(--space-24);
+      flex-wrap: wrap;
+    }
+
+    .platform-tab {
+      padding: var(--space-12) var(--space-24);
+      background: var(--color-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      cursor: pointer;
+      font-weight: var(--font-weight-medium);
+      transition: all 0.2s ease;
+    }
+
+    .platform-tab:hover {
+      background: var(--color-primary);
+      color: var(--color-cream-50);
+      border-color: var(--color-primary);
+    }
+
+    .platform-tab.active {
+      background: var(--color-primary);
+      color: var(--color-cream-50);
+      border-color: var(--color-primary);
+    }
+
+    .platform-content {
+      display: none;
+    }
+
+    .platform-content.active {
+      display: block;
+    }
+
+    .alert {
+      background: var(--color-bg-3);
+      border-left: 4px solid var(--color-primary);
+      padding: var(--space-16);
+      border-radius: var(--radius-base);
+      margin: var(--space-16) 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: var(--space-16);
+      }
+
+      h1 {
+        font-size: var(--font-size-3xl);
+      }
+
+      h2 {
+        font-size: var(--font-size-2xl);
+      }
+
+      .collapsible-content-inner {
+        padding: var(--space-20);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚦 SUMO Traffic Simulation Tutorial</h1>
+    <p class="subtitle">Complete Step-by-Step Guide to Urban Traffic Simulation with SUMO</p>
+  </header>
+
+  <div class="container">
+    <!-- Introduction Section -->
+    <div class="intro-section">
+      <h2>📋 What is SUMO?</h2>
+      <p><strong>SUMO</strong> (Simulation of Urban MObility) is an open-source, highly portable, microscopic and continuous multi-modal traffic simulation package designed to handle large networks. It allows modeling and simulating traffic flows, traffic lights, vehicle interactions, and analyzing traffic patterns.</p>
+      
+      <h3 style="margin-top: var(--space-24);">Typical Traffic Project Workflow:</h3>
+      <ol class="step-list" style="margin-top: var(--space-20);">
+        <li><strong>Install SUMO</strong> on your operating system (Windows, Linux, or macOS)</li>
+        <li><strong>Create or Import Network</strong> using NetEdit or convert OSM files</li>
+        <li><strong>Understand OSM &amp; NetConvert</strong> for map conversions and network preparation</li>
+        <li><strong>Define Routes &amp; Flows</strong> for vehicles (e.g., 50 vehicles/hour)</li>
+        <li><strong>Configure Traffic Lights</strong> and control logic</li>
+        <li><strong>Run Simulation</strong> with SUMO-GUI or command line</li>
+        <li><strong>Control with Python TraCI</strong> for dynamic scenarios</li>
+        <li><strong>Post-Process Results</strong> - analyze queues, wait times, emissions</li>
+      </ol>
+    </div>
+
+    <!-- Step 1: Installation -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>1️⃣ Installation Guide</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p>Choose your operating system and follow the installation instructions. Each platform has a video tutorial to guide you through the process.</p>
+          
+          <div class="platform-tabs">
+            <button class="platform-tab active" onclick="showPlatform('windows')">🪟 Windows</button>
+            <button class="platform-tab" onclick="showPlatform('linux')">🐧 Linux</button>
+            <button class="platform-tab" onclick="showPlatform('macos')">🍎 macOS</button>
+          </div>
+
+          <!-- Windows Installation -->
+          <div id="windows" class="platform-content active">
+            <h3>Windows Installation</h3>
+            <ul class="step-list">
+              <li>Download the latest SUMO installer from <a href="https://www.eclipse.org/sumo/" target="_blank">eclipse.org/sumo</a></li>
+              <li>Run the installer (.exe file) and follow the setup wizard</li>
+              <li>Set the <code>SUMO_HOME</code> environment variable to the installation directory</li>
+              <li>Add SUMO's bin folder to your system PATH</li>
+              <li>Verify installation by opening Command Prompt and typing: <code>sumo --version</code></li>
+            </ul>
+            
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/bPu4bLqGvy8" allowfullscreen></iframe>
+            </div>
+
+
+          </div>
+
+          <!-- Linux Installation -->
+          <div id="linux" class="platform-content">
+            <h3>Linux Installation</h3>
+            <ul class="step-list">
+              <li>Add SUMO repository to your system:
+                <pre><code>sudo add-apt-repository ppa:sumo/stable
+sudo apt-get update</code></pre>
+              </li>
+              <li>Install SUMO and all tools:
+                <pre><code>sudo apt-get install sumo sumo-tools sumo-doc</code></pre>
+              </li>
+              <li>Set environment variable in <code>~/.bashrc</code>:
+                <pre><code>export SUMO_HOME="/usr/share/sumo"</code></pre>
+              </li>
+              <li>Reload bash configuration: <code>source ~/.bashrc</code></li>
+              <li>Verify installation: <code>sumo --version</code></li>
+            </ul>
+            
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/PAAY1zvHeoE" allowfullscreen></iframe>
+            </div>
+
+            <div class="image-container">
+              <img src="https://pplx-res.cloudinary.com/image/upload/v1764605935/search_images/4eb82c4dbc432120af8ea121547be488c95248aa.jpg" alt="SUMO Linux Installation">
+            </div>
+          </div>
+
+          <!-- macOS Installation -->
+          <div id="macos" class="platform-content">
+            <h3>macOS Installation</h3>
+            <ul class="step-list">
+              <li>Install Homebrew if not already installed:
+                <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+              </li>
+              <li>Install SUMO using Homebrew:
+                <pre><code>brew tap dlr-ts/sumo
+brew install sumo</code></pre>
+              </li>
+              <li>Set environment variable in <code>~/.zshrc</code> or <code>~/.bash_profile</code>:
+                <pre><code>export SUMO_HOME="/usr/local/opt/sumo/share/sumo"</code></pre>
+              </li>
+              <li>Reload configuration: <code>source ~/.zshrc</code></li>
+              <li>Verify installation: <code>sumo --version</code></li>
+            </ul>
+            
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/JAAPLxgQ5UQ" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: NetEdit Network Creation -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>2️⃣ Creating Networks with NetEdit</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p><strong>NetEdit</strong> is SUMO's visual network editor that allows you to create road networks, junctions, traffic lights, and more with a graphical interface.</p>
+          
+          <h3>Launching NetEdit</h3>
+          <pre><code>netedit</code></pre>
+          
+          <div class="image-container">
+            <img src="https://pplx-res.cloudinary.com/image/upload/v1763793847/search_images/16fb8bc0b864a17db584316fa413923362213d9d.jpg" alt="NetEdit Interface">
+          </div>
+
+          <h3>Step-by-Step Network Creation:</h3>
+          <ul class="step-list">
+            <li><strong>Create Edges (Roads):</strong> Click the "Edge" mode button, then click on the canvas to place nodes. Edges are automatically created between nodes.</li>
+            <li><strong>Configure Edge Properties:</strong> Right-click an edge to set number of lanes, speed limits, and lane types.</li>
+            <li><strong>Add Junctions:</strong> Junctions are automatically created where edges meet. You can modify junction types (priority, traffic light, etc.).</li>
+            <li><strong>Set Traffic Lights:</strong> Right-click a junction and select "Convert to traffic light junction".</li>
+            <li><strong>Save Network:</strong> File → Save Network As → <code>mynetwork.net.xml</code></li>
+          </ul>
+
+          <div class="alert">
+            <strong>💡 Tip:</strong> Use the "Select" mode to move nodes and modify the network layout. Use "Inspect" mode to view and edit detailed properties.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: OSM Files & NetConvert -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>3️⃣ Understanding OSM Files &amp; NetConvert Tool</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <h3>What is an OSM File?</h3>
+          <p><strong>OSM (OpenStreetMap)</strong> files are XML-based files containing geographical data from OpenStreetMap - a free, editable map of the world created by volunteers. OSM files contain:</p>
+          <ul>
+            <li><strong>Nodes:</strong> Points with latitude/longitude coordinates (intersections, endpoints)</li>
+            <li><strong>Ways:</strong> Ordered lists of nodes representing roads, paths, boundaries</li>
+            <li><strong>Relations:</strong> Logical connections between nodes and ways (bus routes, turn restrictions)</li>
+            <li><strong>Tags:</strong> Metadata describing features (road type, speed limit, name)</li>
+          </ul>
+
+          <h3>How to Download OSM Files:</h3>
+          <ul class="step-list">
+            <li><strong>OpenStreetMap.org:</strong>
+              <ul>
+                <li>Go to <a href="https://www.openstreetmap.org/" target="_blank">openstreetmap.org</a></li>
+                <li>Navigate to your desired area</li>
+                <li>Click "Export" at the top</li>
+                <li>Select the area and click "Export" to download <code>.osm</code> file</li>
+              </ul>
+            </li>
+            
+          </ul>
+
+          <h3>NetConvert Tool - Converting Map Formats</h3>
+          <p><strong>NetConvert</strong> is SUMO's powerful conversion tool that transforms various map formats into SUMO's native <code>.net.xml</code> format. It can also convert SUMO networks to other formats.</p>
+
+          <h3>Converting OSM to SUMO Network (.net.xml):</h3>
+          <pre><code># Basic conversion
+netconvert --osm-files map.osm -o map.net.xml
+
+# Advanced conversion with road network improvements
+netconvert --osm-files map.osm -o map.net.xml \
+  --geometry.remove \
+  --ramps.guess \
+  --junctions.join \
+  --tls.guess-signals</code></pre>
+
+          <h3>NetConvert Options Explained:</h3>
+          <ul>
+            <li><code>--geometry.remove</code> - Removes unnecessary geometry points for cleaner networks</li>
+            <li><code>--ramps.guess</code> - Automatically detects and configures highway ramps</li>
+            <li><code>--junctions.join</code> - Merges nearby junctions into single intersections</li>
+            <li><code>--tls.guess-signals</code> - Automatically places traffic lights at appropriate junctions</li>
+          </ul>
+
+          <h3>What is XODR (OpenDRIVE)?</h3>
+          <p><strong>XODR (OpenDRIVE)</strong> is an open standard format for describing road networks, primarily used in autonomous driving simulation and testing. It provides highly detailed geometric and semantic road descriptions including:</p>
+          <ul>
+            <li>Precise road geometry with reference lines</li>
+            <li>Lane layouts and markings</li>
+            <li>Road signals and signs</li>
+            <li>Objects along the road (barriers, poles)</li>
+          </ul>
+
+          <h3>Converting SUMO Network to XODR:</h3>
+          <pre><code># Convert .net.xml to OpenDRIVE format
+netconvert -s map.net.xml --opendrive-output map.xodr</code></pre>
+
+          <h3>Converting XODR to SUMO Network:</h3>
+          <pre><code># Convert OpenDRIVE to SUMO format
+netconvert --opendrive-files map.xodr -o map.net.xml</code></pre>
+
+          <div class="alert">
+            <strong>💡 Why use XODR?</strong> OpenDRIVE format is essential for integrating SUMO with autonomous vehicle simulators like CARLA, ensuring compatibility across different simulation platforms.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Routes and Flows -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>4️⃣ Creating Routes &amp; Traffic Flows</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <h3>Understanding Routes</h3>
+          <p>Routes define the paths that vehicles take through the network. You need to create a <code>rou.xml</code> file that specifies vehicle types, routes, and flows.</p>
+
+          <h3>Basic Route File Structure (<code>routes.rou.xml</code>):</h3>
+          <pre><code>&lt;routes&gt;
+    &lt;!-- Define vehicle type --&gt;
+    &lt;vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50"/&gt;
+    
+    &lt;!-- Define a route --&gt;
+    &lt;route id="route1" edges="edge1 edge2 edge3 edge4"/&gt;
+    
+    &lt;!-- Define traffic flow --&gt;
+    &lt;flow id="flow1" type="car" route="route1" begin="0" end="3600" 
+          vehsPerHour="600" departLane="best" departSpeed="max"/&gt;
+    
+    &lt;!-- Alternative: Individual vehicles --&gt;
+    &lt;vehicle id="veh1" type="car" route="route1" depart="0"/&gt;
+&lt;/routes&gt;</code></pre>
+
+          <h3>Understanding Traffic Flows - The vehsPerHour Parameter</h3>
+          <p>The <code>vehsPerHour</code> parameter controls how many vehicles enter the network per hour. This is crucial for simulating different traffic conditions:</p>
+
+          <h3>Example 1: Light Traffic (50 vehicles/hour)</h3>
+          <p>Perfect for off-peak hours or residential areas:</p>
+          <pre><code>&lt;routes&gt;
+    &lt;vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50"/&gt;
+    &lt;route id="route_light" edges="edge1 edge2 edge3"/&gt;
+    
+    &lt;!-- 50 vehicles per hour = 1 vehicle every 72 seconds --&gt;
+    &lt;flow id="flow_light" type="car" route="route_light" 
+          begin="0" end="3600" vehsPerHour="50"/&gt;
+&lt;/routes&gt;</code></pre>
+
+          <h3>Example 2: Moderate Traffic (200 vehicles/hour)</h3>
+          <p>Typical daytime traffic on urban roads:</p>
+          <pre><code>&lt;routes&gt;
+    &lt;vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50"/&gt;
+    &lt;route id="route_moderate" edges="edge1 edge2 edge3 edge4"/&gt;
+    
+    &lt;!-- 200 vehicles per hour = 1 vehicle every 18 seconds --&gt;
+    &lt;flow id="flow_moderate" type="car" route="route_moderate" 
+          begin="0" end="3600" vehsPerHour="200"/&gt;
+&lt;/routes&gt;</code></pre>
+
+          <h3>Example 3: Heavy Traffic (500 vehicles/hour)</h3>
+          <p>Rush hour conditions on main arterial roads:</p>
+          <pre><code>&lt;routes&gt;
+    &lt;vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50"/&gt;
+    &lt;route id="route_heavy" edges="edge1 edge2 edge3 edge4 edge5"/&gt;
+    
+    &lt;!-- 500 vehicles per hour = 1 vehicle every 7.2 seconds --&gt;
+    &lt;flow id="flow_heavy" type="car" route="route_heavy" 
+          begin="0" end="3600" vehsPerHour="500"/&gt;
+&lt;/routes&gt;</code></pre>
+
+          <h3>Multiple Flows with Different Rates:</h3>
+          <pre><code>&lt;routes&gt;
+    &lt;vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" maxSpeed="50"/&gt;
+    &lt;vType id="truck" accel="1.5" decel="3.5" sigma="0.3" length="12" maxSpeed="35"/&gt;
+    
+    &lt;route id="route_north" edges="n1 n2 n3 n4"/&gt;
+    &lt;route id="route_south" edges="s1 s2 s3 s4"/&gt;
+    
+    &lt;!-- Main road: 50 cars per hour --&gt;
+    &lt;flow id="cars_north" type="car" route="route_north" 
+          begin="0" end="3600" vehsPerHour="50"/&gt;
+    
+    &lt;!-- Side road: 20 cars per hour --&gt;
+    &lt;flow id="cars_south" type="car" route="route_south" 
+          begin="0" end="3600" vehsPerHour="20"/&gt;
+    
+    &lt;!-- Trucks: 10 per hour on main road --&gt;
+    &lt;flow id="trucks_north" type="truck" route="route_north" 
+          begin="0" end="3600" vehsPerHour="10"/&gt;
+&lt;/routes&gt;</code></pre>
+
+          <h3>Creating Routes in NetEdit:</h3>
+          <ul class="step-list">
+            <li>Open your network in NetEdit</li>
+            <li>Switch to "Demand" mode (traffic light icon in toolbar)</li>
+            <li>Create vehicle types with specific parameters</li>
+            <li>Define routes by selecting edges in sequence</li>
+            <li>Set flows with departure rates using <code>vehsPerHour</code> parameter</li>
+            <li>Save as <code>routes.rou.xml</code></li>
+          </ul>
+
+          <div class="alert">
+            <strong>💡 Pro Tip:</strong> Use <code>vehsPerHour</code> for continuous traffic flow. The value directly represents vehicles per hour: 50 = light traffic, 200 = moderate, 500+ = heavy congestion.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Traffic Lights -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>5️⃣ Traffic Light Configuration</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p>Traffic lights are crucial for managing intersection flow. SUMO allows you to define custom phases and timing for each traffic light.</p>
+
+          <h3>Traffic Light Phases</h3>
+          <p>Each phase defines which lanes have green, yellow, or red signals. Phases are defined in a separate file or inline in the network.</p>
+
+          <h3>Traffic Light Definition (<code>tllogic.add.xml</code>):</h3>
+          <pre><code>&lt;additional&gt;
+    &lt;tlLogic id="junction1" type="static" programID="1" offset="0"&gt;
+        &lt;!-- Phase 1: North-South Green --&gt;
+        &lt;phase duration="30" state="GGrrrrGGrrrr"/&gt;
+        
+        &lt;!-- Phase 2: North-South Yellow --&gt;
+        &lt;phase duration="3" state="yyrrrryyrrrr"/&gt;
+        
+        &lt;!-- Phase 3: East-West Green --&gt;
+        &lt;phase duration="30" state="rrGGrrrrGGrr"/&gt;
+        
+        &lt;!-- Phase 4: East-West Yellow --&gt;
+        &lt;phase duration="3" state="rryyrrrryyrr"/&gt;
+    &lt;/tlLogic&gt;
+&lt;/additional&gt;</code></pre>
+
+          <h3>State String Explanation:</h3>
+          <ul>
+            <li><code>G</code> = Green (go)</li>
+            <li><code>g</code> = Green without priority</li>
+            <li><code>y</code> = Yellow (prepare to stop)</li>
+            <li><code>r</code> = Red (stop)</li>
+          </ul>
+
+          <h3>Rush Hour Traffic Light Design:</h3>
+          <p>For rush hour scenarios, adjust phase durations to accommodate higher traffic volumes on main routes:</p>
+          <pre><code>&lt;!-- Rush Hour Configuration --&gt;
+&lt;tlLogic id="junction1" type="static" programID="rush_hour"&gt;
+    &lt;!-- Longer green time for main road (45 seconds) --&gt;
+    &lt;phase duration="45" state="GGrrrrGGrrrr"/&gt;
+    &lt;phase duration="3" state="yyrrrryyrrrr"/&gt;
+    
+    &lt;!-- Shorter green time for side road (20 seconds) --&gt;
+    &lt;phase duration="20" state="rrGGrrrrGGrr"/&gt;
+    &lt;phase duration="3" state="rryyrrrryyrr"/&gt;
+&lt;/tlLogic&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: Python TraCI Control -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>6️⃣ Python TraCI Control</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p><strong>TraCI</strong> (Traffic Control Interface) allows you to control the simulation dynamically using Python scripts. You can modify traffic lights, vehicles, and gather real-time data.</p>
+
+          <h3>Basic TraCI Setup:</h3>
+          <pre><code>import traci
+import os
+import sys
+
+# Set SUMO_HOME environment variable
+if 'SUMO_HOME' in os.environ:
+    tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
+    sys.path.append(tools)
+else:
+    sys.exit("Please declare environment variable 'SUMO_HOME'")
+
+# Start SUMO with configuration
+sumoBinary = "sumo-gui"  # or "sumo" for command line
+sumoCmd = [sumoBinary, "-c", "simulation.sumocfg"]
+
+traci.start(sumoCmd)
+
+# Run simulation for 1000 steps
+step = 0
+while step < 1000:
+    traci.simulationStep()
+    step += 1
+
+traci.close()</code></pre>
+
+          <h3>Keyboard Control Example:</h3>
+          <pre><code>import traci
+import keyboard  # pip install keyboard
+import time
+
+traci.start(["sumo-gui", "-c", "config.sumocfg"])
+
+# Traffic light control variables
+current_phase = 0
+junction_id = "junction1"
+
+def change_traffic_light():
+    global current_phase
+    current_phase = (current_phase + 1) % 4  # Cycle through 4 phases
+    traci.trafficlight.setPhase(junction_id, current_phase)
+    print(f"Changed to phase {current_phase}")
+
+print("Press SPACE to change traffic light phase")
+print("Press ESC to exit simulation")
+
+step = 0
+while step < 3600:
+    traci.simulationStep()
+    
+    # Check for keyboard input
+    if keyboard.is_pressed('space'):
+        change_traffic_light()
+        time.sleep(0.3)  # Debounce
+    
+    if keyboard.is_pressed('esc'):
+        break
+    
+    step += 1
+
+traci.close()</code></pre>
+
+          <h3>Collecting Simulation Data:</h3>
+          <pre><code># Get vehicle information
+vehicle_ids = traci.vehicle.getIDList()
+
+for veh_id in vehicle_ids:
+    speed = traci.vehicle.getSpeed(veh_id)
+    position = traci.vehicle.getPosition(veh_id)
+    waiting_time = traci.vehicle.getWaitingTime(veh_id)
+    
+    print(f"Vehicle {veh_id}: Speed={speed:.2f}, Wait={waiting_time:.1f}s")
+
+# Get traffic light information
+tl_state = traci.trafficlight.getRedYellowGreenState(junction_id)
+print(f"Traffic light state: {tl_state}")</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7: Running Simulation -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>7️⃣ Running the Simulation</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <h3>Create Configuration File (<code>simulation.sumocfg</code>):</h3>
+          <pre><code>&lt;configuration&gt;
+    &lt;input&gt;
+        &lt;net-file value="mynetwork.net.xml"/&gt;
+        &lt;route-files value="routes.rou.xml"/&gt;
+        &lt;additional-files value="tllogic.add.xml"/&gt;
+    &lt;/input&gt;
+    
+    &lt;time&gt;
+        &lt;begin value="0"/&gt;
+        &lt;end value="3600"/&gt;
+    &lt;/time&gt;
+    
+    &lt;processing&gt;
+        &lt;time-to-teleport value="-1"/&gt;
+    &lt;/processing&gt;
+&lt;/configuration&gt;</code></pre>
+
+          <h3>Running Options:</h3>
+          <ul class="step-list">
+            <li><strong>GUI Mode:</strong> Visual simulation with controls
+              <pre><code>sumo-gui -c simulation.sumocfg</code></pre>
+            </li>
+            <li><strong>Command Line Mode:</strong> Faster execution without graphics
+              <pre><code>sumo -c simulation.sumocfg</code></pre>
+            </li>
+            <li><strong>With Python TraCI:</strong> Dynamic control during simulation
+              <pre><code>python simulation_control.py</code></pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 8: Post-Processing & Analysis -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <h2>8️⃣ Post-Processing &amp; Analysis</h2>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p>After running the simulation, analyze the results to understand traffic patterns, identify bottlenecks, and evaluate environmental impact.</p>
+
+          <h3>Output Files Configuration:</h3>
+          <pre><code>&lt;output&gt;
+    &lt;!-- Vehicle trip information --&gt;
+    &lt;tripinfo-output value="tripinfo.xml"/&gt;
+    
+    &lt;!-- Queue length at edges --&gt;
+    &lt;queue-output value="queue.xml"/&gt;
+    
+    &lt;!-- Emissions data --&gt;
+    &lt;emission-output value="emissions.xml"/&gt;
+    
+    &lt;!-- Summary statistics --&gt;
+    &lt;summary-output value="summary.xml"/&gt;
+&lt;/output&gt;</code></pre>
+
+          <h3>Key Metrics to Analyze:</h3>
+          <ul class="step-list">
+            <li><strong>Queue Length:</strong> Number of vehicles waiting at intersections</li>
+            <li><strong>Waiting Time:</strong> Total time vehicles spend stopped or moving slowly</li>
+            <li><strong>Travel Time:</strong> Time taken to complete journeys</li>
+            <li><strong>Emissions:</strong> CO2, NOx, PM, and fuel consumption</li>
+            <li><strong>Throughput:</strong> Number of vehicles completing trips</li>
+          </ul>
+
+          <h3>Python Analysis Script:</h3>
+          <pre><code>import xml.etree.ElementTree as ET
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Parse trip information
+tree = ET.parse('tripinfo.xml')
+root = tree.getroot()
+
+trip_data = []
+for trip in root.findall('tripinfo'):
+    trip_data.append({
+        'id': trip.get('id'),
+        'duration': float(trip.get('duration')),
+        'waitingTime': float(trip.get('waitingTime')),
+        'timeLoss': float(trip.get('timeLoss'))
+    })
+
+df = pd.DataFrame(trip_data)
+
+# Calculate statistics
+print(f"Average Duration: {df['duration'].mean():.2f}s")
+print(f"Average Waiting Time: {df['waitingTime'].mean():.2f}s")
+print(f"Average Time Loss: {df['timeLoss'].mean():.2f}s")
+
+# Visualize waiting times
+plt.figure(figsize=(10, 6))
+plt.hist(df['waitingTime'], bins=30, edgecolor='black')
+plt.xlabel('Waiting Time (seconds)')
+plt.ylabel('Number of Vehicles')
+plt.title('Distribution of Vehicle Waiting Times')
+plt.savefig('waiting_time_histogram.png')
+plt.show()</code></pre>
+
+          <h3>Environmental Impact Analysis:</h3>
+          <pre><code># Parse emissions data
+emissions_tree = ET.parse('emissions.xml')
+emissions_root = emissions_tree.getroot()
+
+total_co2 = 0
+total_nox = 0
+total_fuel = 0
+
+for timestep in emissions_root.findall('timestep'):
+    for vehicle in timestep.findall('vehicle'):
+        total_co2 += float(vehicle.get('CO2', 0))
+        total_nox += float(vehicle.get('NOx', 0))
+        total_fuel += float(vehicle.get('fuel', 0))
+
+print(f"Total CO2 Emissions: {total_co2/1000:.2f} kg")
+print(f"Total NOx Emissions: {total_nox:.2f} g")
+print(f"Total Fuel Consumption: {total_fuel:.2f} ml")</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleCollapsible(header) {
+      const collapsible = header.parentElement;
+      const content = collapsible.querySelector('.collapsible-content');
+      const isActive = collapsible.classList.contains('active');
+      
+      if (isActive) {
+        collapsible.classList.remove('active');
+        content.style.maxHeight = '0';
+      } else {
+        collapsible.classList.add('active');
+        content.style.maxHeight = content.scrollHeight + 'px';
+      }
+    }
+
+    function showPlatform(platform) {
+      // Hide all platform contents
+      const contents = document.querySelectorAll('.platform-content');
+      contents.forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.platform-tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected platform
+      document.getElementById(platform).classList.add('active');
+      
+      // Add active class to clicked tab
+      const clickedTab = Array.from(tabs).find(tab => 
+        tab.textContent.toLowerCase().includes(platform)
+      );
+      if (clickedTab) {
+        clickedTab.classList.add('active');
+      }
+    }
+
+    // Auto-resize collapsible content on window resize
+    window.addEventListener('resize', function() {
+      const activeCollapsibles = document.querySelectorAll('.collapsible.active .collapsible-content');
+      activeCollapsibles.forEach(function(content) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      });
+    });
+  </script>
+</body>
+</html>
