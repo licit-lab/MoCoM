@@ -1,0 +1,15 @@
+name: mocom-control-demos
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pandas
+  - cvxpy
+  - matplotlib
+  - ipywidgets
+  - IPython
+  - jupyterlab
+  - lxml
+  - scikit-learn
+  - numpy
+  - pip
